@@ -43,7 +43,91 @@
   const bodyParser = require('body-parser');
   
   const app = express();
-  
+  const path=require('path');
+  const fs= require('fs');
   app.use(bodyParser.json());
-  
+
+
+
+  let todos=[];
+  let todoIdCounter=1;
+
+  const findIndex=(arr,id)=>{
+    for(let i=0;i<arr.length;i++){
+      if(arr[i].id === id) return i; 
+    }
+    return -1;
+  }
+
+  function removeAtIndex(arr,index){
+    let newArray=[];
+    for(let i=0;i<arr.length;i++){
+      if (i !== index) newArray.push(arr[i]);
+    }
+    return newArray;
+  }
+
+  //1
+  app.get('/todos',(req,res)=>{
+    fs.readFile('todos.json','utf-8',(err,data)=>{
+      let file=JSON.parse(data);
+      res.status(200).json(file);
+    });
+  });
+
+
+  //2
+  app.get('/todos/:id',(req,res)=>{
+    
+    fs.readFile("todos.json",'utf-8',(err,data)=>{
+      if(err) throw err;
+      const data1=JSON.parse(data);
+      const id1=req.params.id;
+      const todos=findIndex(data1,id1)
+      if (todoIndex === -1) {
+        res.status(404).send();
+      } else {
+        res.json(todos[todoIndex]);
+      }
+
+    });
+  });
+
+
+//3
+  app.post('/todos',(req,res)=>{
+    let newTodo={
+      id:todoIdCounter++,
+      title:req.body.title,
+      description:req.body.description
+    };
+
+    fs.readFile("todos.json","utf-8",(err,data)=>{
+      if(err) throw err;
+      const todo=JSON.parse(data);
+      todo.push(newTodo);
+      fs.writeFile("todos.json",JSON.stringify(todos),(err)=>{
+        if(err) throw err;
+        res.status(201).json(newTodo);
+      })
+    })
+  });
+
+
+  //4
+  app.put("/todos.json",(req,res)=>{
+    fs.readFile("todos.json","utf-8",(err,data)=>{
+      if(err) throw err;
+      let todo=JSON.parse(data);
+      let todoId=req.body.id;
+      const removed=removeAtIndex(todo,todoId);
+      todo.push(removed);
+      fs.writeFile("todos.json",todo,(err)=>{
+        if(err) throw err;
+        res.status(200).json(todo);
+      })
+
+    })
+  })
+
   module.exports = app;
