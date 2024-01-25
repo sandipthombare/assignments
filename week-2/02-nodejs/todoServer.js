@@ -52,9 +52,10 @@
 
   function findIndex(arr,id) {
     for(let i=0;i<arr.length;i++){
-      if(arr[i].id === id) return i; 
+      if(arr[i].id === id) return i;
+       
     }
-    return -1;
+    
   }
 
   function removeAtIndex(arr,index){
@@ -109,7 +110,7 @@
           res.status(500).send('Internal Server Error');
           return;
         }
-          res.status(200).json(newTodo);
+          res.status(201).json(newTodo);
       });
     });
   });
@@ -163,9 +164,7 @@
   });
 
 
-app.use((req, res) => {
-    res.status(404).send('Not Found');
-  });
+
 
 module.exports = app;
 
